@@ -1,0 +1,7 @@
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\bin\Debug\OD_project_console.exe.config
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\bin\Debug\OD_project_console.exe
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\bin\Debug\OD_project_console.pdb
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\obj\Debug\OD_project_console.csprojAssemblyReference.cache
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\obj\Debug\OD_project_console.csproj.CoreCompileInputs.cache
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\obj\Debug\OD_project_console.exe
+C:\Users\Ela\source\repos\OD_project_console\OD_project_console\obj\Debug\OD_project_console.pdb
