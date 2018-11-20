@@ -12,7 +12,7 @@ namespace OD_project_console
         private static byte[] asciiCodes;
 
         // Dlugosc skrótu bloku 32B
-        private static int hash_len = 32;
+        private static int hash_len = 16;
 
         // Dlugosc bloku 8B
         private static int block_len = 8;

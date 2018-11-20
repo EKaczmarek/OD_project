@@ -28,7 +28,7 @@ namespace OD_project_console
         {
             string text;
             int words_ammout = 1000;
-            int words_lenght = 12;
+            int words_lenght = 20;
 
             List<string> words = new List<string>();
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -45,18 +45,6 @@ namespace OD_project_console
                     if (!words.Contains(text))
                         words.Add(text);
                 }
-                //System.Console.WriteLine("\nWiadomość: " + text);
-
-                //string[] separators = new string[] { ",", ".", "!", "\'", " ", "\'s" };
-
-                //foreach (string word in text.Split(separators, StringSplitOptions.RemoveEmptyEntries))
-                //{
-                //    if (!words.Contains(word))
-                //    {
-                //        words.Add(word);
-                //        //Console.WriteLine(word);
-                //    }
-                //}
             }
 
 
