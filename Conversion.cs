@@ -12,7 +12,7 @@ namespace OD_project_console
         private static byte[] asciiCodes;
 
         // Dlugosc skrótu bloku 32B
-        private static int hash_len = 16;
+        private static int hash_len = 32;
 
         // Dlugosc bloku 8B
         private static int block_len = 8;
@@ -25,6 +25,9 @@ namespace OD_project_console
         private static byte[] hash_bytes;
 
         private static string result_count = "";
+        private static string result = "";
+        private static int hash_len_var = 5;
+
         public static void set_message(string _message)
         {
             message = _message;
@@ -47,22 +50,16 @@ namespace OD_project_console
         }
         private static void xor()
         {
-            //Console.WriteLine("Wejście asciiCodes:");
-            //for (int i = 0; i < asciiCodes.Length; i++)
-            //    Console.Write(asciiCodes[i] + ",");
-
-            //Console.WriteLine("\nWejście for_hash:");
-            //for (int i = 0; i < dict_for_hash.Length; i++)
-            //    Console.Write(dict_for_hash[i] + ",");
-
-
+            // każdy blok XOR 
             string bajt = "";
             while (bajt.Length / 8 < hash_len - 1) {
-                for (int j = 0; j < asciiCodes.Length - 2; j += 2)
+                for (int j = 0; j < asciiCodes.Length - 2; j += 1)
                 {
+                    //Console.WriteLine("asciiCodes[j] ", asciiCodes[j], "asciiCodes[j+2] ", asciiCodes[j+2]);
+
                     for (int k = 0; k < 8; k++)
                     {
-                        bool test = GetBit(asciiCodes[j], k) ^ (GetBit(asciiCodes[j + 2], k));
+                        bool test = GetBit(asciiCodes[j], k) ^ (GetBit(asciiCodes[j + 1], k));
                         if (test) bajt += 1;
                         else bajt += 0;
                         if ((bajt.Length) / 8 == hash_len - 1)
@@ -88,7 +85,7 @@ namespace OD_project_console
                     if (dict_for_hash[i%j] == '0')
                         temp = false;
                     else temp = true;
-                    bool test = GetBit(hash_bytes[i%j], j-1) ^ temp;
+                    bool test = GetBit(hash_bytes[i%31], j-1) ^ temp;
 
                     if (test) hash_res += "1";
                     else hash_res += "0";
@@ -109,7 +106,6 @@ namespace OD_project_console
                     bool test = GetBit(hash_bytes[i-1], j) ^ GetBit((byte)(i-1), j);
                     if (test) test_hash += "1";
                     else test_hash += "0";
-
                 }
             }
 
@@ -119,19 +115,26 @@ namespace OD_project_console
 
             //Console.WriteLine("\nWynikowe bajty:");
             string result_hash = "";
+
+
+            
             for (int j = 1; j < hash_len + 1; j++)
             {
-                int a = hash_bytes[j-1] % (dict_for_hash.Length - 1);
-                //Console.Write(a + ", ");
-                result_hash += dict_for_hash[a];
+                int a = (hash_bytes[j - 1] % (hash_bytes.Length - 1)) % (dict_for_hash.Length - 1);
+                    //Console.Write(a + ", ");
+                    result_hash += dict_for_hash[a];
             }
+            result = result_hash.Substring(0, hash_len);
+
+           
             //Console.WriteLine("Wynikowy hash: " + result_hash);
             //Console.WriteLine("Długość hasha: " + result_hash.Length);
 
-            result_count = result_hash;
+
         }
 
         private static void xor_dictionary_hasbytes() {
+
         }
         
         private static byte[] getBitwiseByteArray(string input)
@@ -169,32 +172,32 @@ namespace OD_project_console
                 dict_for_hash += symbol;
             }
             //LETTERS
-            for (int i = 97; i < 123; i++)
-            {
-                char symbol = (char)i;
-                //Console.WriteLine("{0} -> {1}", i, symbol);
-                dict_for_hash += symbol;
-            }
+            //for (int i = 97; i < 123; i++)
+            ////for (int i = 97; i < 123; i++)
+            //{
+            //    char symbol = (char)i;
+            //    //Console.WriteLine("{0} -> {1}", i, symbol);
+            //    dict_for_hash += symbol;
+            //}
             //Console.WriteLine("Rozmiar tablicy: " + dict_for_hash.Length.ToString());
         }
-        public static string count()
+        public static string count(int hash_len_res)
         {
+            // pobranie alfabetu do hasha
             chars_for_hash();
-            asciiCodes = new byte[((message.Length / 8) + 1) * 8];
+          
+            asciiCodes = new byte[((message.Length / block_len) + 1) * block_len];
             hash_bytes = new byte[32];
-
-            //Console.Write("Message: ", message);           
-
-            //for (int i = 0; i < asciiCodes.Length; i++)
-            //{
-            //    Console.Write(i.ToString() + " " + asciiCodes[i].ToString() + "\n");
-            //}
 
             fulfill();
             xor();
-            
-           
-            return result_count;
+
+            string res = "";
+            for (int i = 0; i < hash_len_res; i++)
+            {
+                res += result[(i * hash_len_res)];
+            }
+            return res;
         }
 
     }

@@ -2,40 +2,43 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OD_project_console
 {
+    public static class RandomString
+    {
+        private static Random random = new Random();
+        public static void SetSeed(int seed)
+        { random = new Random(seed); }
+
+        public static string Next(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoprstuvwxyz0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+    }
     class Program
     {
-        public static string RandomString(int size, bool lowerCase)
-        {
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (int i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-            if (lowerCase)
-                return builder.ToString().ToLower();
-            return builder.ToString();
-        }
+        ////////////////// DANE //////////////////////////
+        private static int words_ammount = 2000;
+        private static int words_lenght = 20;
+        private static int hash_len_res = 5;
+        private static int seed = 10;
+
 
         static void Main(string[] args)
         {
-            string text;
-            int words_ammout = 1000;
-            int words_lenght = 20;
-
             List<string> words = new List<string>();
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
 
-            while (words.Count != words_ammout)
+            // USTAWIENIE ZIARNA
+            RandomString.SetSeed(Convert.ToInt32(seed));
+
+            // GENEROWANIE STRNGÓW WEJSCIOWYCH
+            while (words.Count != words_ammount)
             {
-                text = RandomString(words_lenght, true);
+                var text = RandomString.Next(words_lenght);
                 if (words.Count == 0)
                 {
                     words.Add(text);
@@ -46,39 +49,70 @@ namespace OD_project_console
                         words.Add(text);
                 }
             }
+            //LISTA POJEDYCZNYCH HASHY TO ZLICZENIA 
+            List<string> hashes = new List<string>();
 
+            // ROZPOCZĘCIE ODLICZANIA CZASU
+            var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            foreach (string item in words) { 
+            // GENEROWANIE HASHY DLA KAŻDEGO STRINGA 
+            foreach (string item in words) {
 
                 Conversion.set_message(item);
-                string result = Conversion.count();
+                string result = Conversion.count(hash_len_res);                
                 dictionary.Add(item, result);
+
+                hashes.Add(result);
             }
+            // ZAKOŃCZENIE ODLICZANIA CZASU
+            watch.Stop();
 
-            int hash_lenght = dictionary[words[0]].Length;
-            //foreach (KeyValuePair<string, string> item in dictionary)
-            //{
-            //    Console.WriteLine("Key: {0}, Value: {1}", item.Key, item.Value);
-            //}
+            //////////////////WYNIKI//////////////////////////
+            ///
+            // SŁOWNIK dictionary string wejściowy - hash
+            int kolizje = hashes.GroupBy(x => x)
+                        .Where(group => group.Count() > 1)
+                        .Select(group => group.Key).Count();
 
+            var elapsedMs = watch.ElapsedMilliseconds;
 
-            int kolizje = 0;
-            var lookup = dictionary.ToLookup(x => x.Value).Where(x => x.Count() > 1);
-            foreach (var item in lookup)
-            {
-                var keys = item.Aggregate("", (s, v) => s + ", " + v);
-                var message = "te same wartości maja: " + item.Key + ":" + keys;
-                Console.WriteLine(message);
-                kolizje++;
-            }
-            Console.WriteLine("\nDlugosc stringow wejsciowych: " + words_lenght);            
-            Console.WriteLine("Ilość stringów wejściowych: " + words_ammout);
-            Console.WriteLine("Długość hashy: " + hash_lenght);
+            Console.WriteLine("\nDlugosc stringow wejsciowych: " + words_lenght);
+            Console.WriteLine("Ilość stringów wejściowych: " + words_ammount);
+            Console.WriteLine("Długość hashy: " + hash_len_res);
             Console.WriteLine("Ilość kolizji: " + kolizje);
 
-            
-            Console.ReadKey();
+            Console.WriteLine("Czas generowanie hashy: " + elapsedMs + " ms");
 
+
+            Console.ReadKey();
+            #region zapis_do_pliku
+            try
+            { 
+                //Pass the filepath and filename to the StreamWriter Constructor
+                StreamWriter sw = new StreamWriter("Test.txt");
+                
+                foreach (KeyValuePair<string, string> item in dictionary)
+                {
+                    //Console.WriteLine("Key: {0}, Value: {1}", item.Key, item.Value);
+                    sw.WriteLine(item.Key + "\t" + item.Value);
+                }
+
+                sw.WriteLine("Czas generowania: " + elapsedMs + " ms");                    
+
+                sw.WriteLine("Ilość kolizji: " + kolizje);
+
+                sw.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                
+            }
+            #endregion
         }
     }
 }
